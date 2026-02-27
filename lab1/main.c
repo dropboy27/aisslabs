@@ -57,7 +57,7 @@ Node* InsertNode(Node *root, Node *newNode){
     
 void PrintTree(Node *root, int depth){
     if (root==NULL){
-        return NULL;
+        return;
     }
     for (int i = 0; i < depth; i++) {
         printf("    ");
@@ -67,91 +67,99 @@ void PrintTree(Node *root, int depth){
     PrintTree(root->right, depth + 1);
 }
 
-Node* DeleteNode(Node *TargetNode){
-    if (TargetNode == NULL){
+
+Node* DeleteNode(Node *TargetNode) {
+    if (TargetNode == NULL) {
         return NULL;
     }
 
     Node *root = TargetNode;
-    while (root->parent != NULL){
+    while (root->parent != NULL) {
         root = root->parent;
     }
 
-    if (TargetNode->left == NULL && TargetNode->right == NULL){
-        Node *NodeParent = TargetNode->parent;
-        if (NodeParent == NULL) {
-            free(TargetNode);
-            return NULL;
-        }
-        if(TargetNode == NodeParent->left){
-            NodeParent->left = NULL; 
-        }
-        else{
-            NodeParent->right = NULL;
+    if (TargetNode->left == NULL && TargetNode->right == NULL) {
+        Node *parent = TargetNode->parent;
+        if (parent != NULL) {
+            if (parent->left == TargetNode) {
+                parent->left = NULL;
+            } else {
+                parent->right = NULL;
+            }
         }
         free(TargetNode);
+        if (parent == NULL) {
+            return NULL;
+        } else {
+            return root;
+    }
+
+    if (TargetNode->left != NULL && TargetNode->right == NULL) {
+        Node *child = TargetNode->left;
+        Node *parent = TargetNode->parent;
+        child->parent = parent;
+        if (parent != NULL) {
+            if (parent->left == TargetNode) {
+                parent->left = child;
+            } else {
+                parent->right = child;
+            }
+            free(TargetNode);
+            return root;
+        } else {
+            free(TargetNode);
+            return child;
+        }
+    }
+
+    if (TargetNode->left == NULL && TargetNode->right != NULL) {
+        Node *child = TargetNode->right;
+        Node *parent = TargetNode->parent;
+        child->parent = parent;
+        if (parent != NULL) {
+            if (parent->left == TargetNode) {
+                parent->left = child;
+            } else {
+                parent->right = child;
+            }
+            free(TargetNode);
+            return root;
+        } else {
+            free(TargetNode);
+            return child;
+        }
+    }
+
+    if (TargetNode->left != NULL && TargetNode->right != NULL) {
+        Node *successor = TargetNode->right;
+        while (successor->left != NULL) {
+            successor = successor->left;
+        }
+        TargetNode->val = successor->val;
+        Node *parentOfSucc = successor->parent;
+
+        if (successor->right != NULL) {
+            successor->right->parent = parentOfSucc;
+            if (parentOfSucc->left == successor) {
+                parentOfSucc->left = successor->right;
+            } else {
+                parentOfSucc->right = successor->right;
+            }
+        } else {
+            if (parentOfSucc->left == successor) {
+                parentOfSucc->left = NULL;
+            } else {
+                parentOfSucc->right = NULL;
+            }
+        }
+        free(successor);
+
         return root;
     }
 
-    else if (TargetNode->left != NULL && TargetNode->right == NULL){
-        Node *NodeParent = TargetNode->parent;
-        if (NodeParent == NULL) {
-            TargetNode->left->parent = NULL;
-            free(TargetNode);
-            return NULL;
-        }
-        TargetNode->left->parent = NodeParent;
-        if(TargetNode == NodeParent->left){
-            NodeParent->left = TargetNode->left; 
-        }
-        else{
-            NodeParent->right = TargetNode->left;
-        }
-        free(TargetNode);
-        return root;
-    }
-    else if (TargetNode->left == NULL && TargetNode->right != NULL){
-        Node *NodeParent = TargetNode->parent;
-        if (NodeParent == NULL) {
-            TargetNode->right->parent = NULL;
-            free(TargetNode);
-            return NULL;
-        }
-        TargetNode->right->parent = NodeParent;
-        if(TargetNode == NodeParent->left){
-            NodeParent->left = TargetNode->right;
-            
-        }
-        else{
-            NodeParent->right = TargetNode->right;
-        }
-        free(TargetNode);
-        return root;
-    }
-    else if (TargetNode->left != NULL && TargetNode->right != NULL) {
-        Node *NewNode = TargetNode->right;
-        while (NewNode->left !=NULL)
-        {
-            NewNode = NewNode->left;
-        }
-        if (NewNode->parent == TargetNode){
-            NewNode->parent = TargetNode->parent;
-            NewNode->left = TargetNode->left;
-            free(TargetNode);
-        }
-        else{
-            NewNode->right->parent = NewNode->parent;
-            NewNode->parent->left = NewNode->right;
-            NewNode->parent = TargetNode ->parent;
-            NewNode->left = TargetNode->left;
-            NewNode->right = TargetNode->right;
-            free(TargetNode);
-        }
+    return root;
     }
 }
-
-
-int main() {
-    
+int main(){
     return 0;
 }
