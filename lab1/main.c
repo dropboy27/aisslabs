@@ -160,6 +160,79 @@ Node* DeleteNode(Node *TargetNode) {
     return root;
     }
 }
-int main(){
+
+int CountVertex(Node* root){
+    if (root == NULL){
+        return 0;
+    }
+    else{
+        return 1 + CountVertex(root->left) + CountVertex(root->right);
+    }
+}
+
+Node* FindNode(Node* root, int val) {
+    while (root != NULL) {
+        if (val == root->val)
+            return root;
+        else if (val < root->val)
+            root = root->left;
+        else
+            root = root->right;
+    }
+    return NULL;
+}
+
+int main() {
+    Node *root = NULL;
+    int choice, val;
+
+    while (1) {
+        printf("1. Add node\n");
+        printf("2. Print tree\n");
+        printf("3. Delete node\n");
+        printf("4. Count vertices\n");
+        printf("5. Exit\n");
+        printf("Choose: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &val);
+                Node *newNode = CreateNode(val);
+                if (newNode == NULL) {
+                    printf("Memory allocation failed\n");
+                } else {
+                    root = InsertNode(root, newNode);
+                }
+                break;
+
+            case 2:
+                PrintTree(root, 0);
+                break;
+
+            case 3:
+                printf("Enter value to delete: ");
+                scanf("%d", &val);
+                Node *toDelete = FindNode(root, val);
+                if (toDelete == NULL) {
+                    printf("Node not found\n");
+                } else {
+                    root = DeleteNode(toDelete);
+                }
+                break;
+
+            case 4:
+                printf("Number of vertices: %d\n", CountVertex(root));
+                break;
+
+            case 5:
+                return 0;
+
+            default:
+                printf("Invalid choice\n");
+        }
+    }
+
     return 0;
 }
