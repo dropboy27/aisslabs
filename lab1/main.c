@@ -55,18 +55,20 @@ Node* InsertNode(Node *root, Node *newNode){
     return originalRoot;
 }
     
-void PrintTree(Node *root, int depth){
-    if (root==NULL){
+void PrintTree(Node *root, int depth) {
+    if (root == NULL) {
         return;
     }
+
+    PrintTree(root->right, depth + 1);
+
     for (int i = 0; i < depth; i++) {
         printf("    ");
-        printf("%d\n", root->val);
     }
-    PrintTree(root->left, depth + 1);
-    PrintTree(root->right, depth + 1);
-}
+    printf("%d\n", root->val);
 
+    PrintTree(root->left, depth + 1);
+}
 
 Node* DeleteNode(Node *TargetNode) {
     if (TargetNode == NULL) {
