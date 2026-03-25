@@ -71,9 +71,7 @@ void PrintTree(Node *root, int depth) {
 }
 
 Node* DeleteNode(Node *TargetNode) {
-    if (TargetNode == NULL) {
-        return NULL;
-    }
+    if (TargetNode == NULL) return NULL;
 
     Node *root = TargetNode;
     while (root->parent != NULL) {
@@ -94,9 +92,9 @@ Node* DeleteNode(Node *TargetNode) {
             return NULL;
         } else {
             return root;
+        }
     }
-
-    if (TargetNode->left != NULL && TargetNode->right == NULL) {
+    else if (TargetNode->left != NULL && TargetNode->right == NULL) {
         Node *child = TargetNode->left;
         Node *parent = TargetNode->parent;
         child->parent = parent;
@@ -106,15 +104,16 @@ Node* DeleteNode(Node *TargetNode) {
             } else {
                 parent->right = child;
             }
-            free(TargetNode);
-            return root;
+        }
+        free(TargetNode);
+        if (parent == NULL) {
+            return child;        // новый корень
         } else {
-            free(TargetNode);
-            return child;
+            return root;
         }
     }
-
-    if (TargetNode->left == NULL && TargetNode->right != NULL) {
+        // Случай 3: только правый ребёнок
+    else if (TargetNode->left == NULL && TargetNode->right != NULL) {
         Node *child = TargetNode->right;
         Node *parent = TargetNode->parent;
         child->parent = parent;
@@ -124,42 +123,35 @@ Node* DeleteNode(Node *TargetNode) {
             } else {
                 parent->right = child;
             }
-            free(TargetNode);
-            return root;
-        } else {
-            free(TargetNode);
+        }
+        free(TargetNode);
+        if (parent == NULL) {
             return child;
+        } else {
+            return root;
         }
     }
-
-    if (TargetNode->left != NULL && TargetNode->right != NULL) {
+    else {
         Node *successor = TargetNode->right;
         while (successor->left != NULL) {
             successor = successor->left;
         }
         TargetNode->val = successor->val;
         Node *parentOfSucc = successor->parent;
+        Node *childOfSucc = successor->right;
 
-        if (successor->right != NULL) {
-            successor->right->parent = parentOfSucc;
+        if (parentOfSucc != NULL) {
             if (parentOfSucc->left == successor) {
-                parentOfSucc->left = successor->right;
+                parentOfSucc->left = childOfSucc;
             } else {
-                parentOfSucc->right = successor->right;
-            }
-        } else {
-            if (parentOfSucc->left == successor) {
-                parentOfSucc->left = NULL;
-            } else {
-                parentOfSucc->right = NULL;
+                parentOfSucc->right = childOfSucc;
             }
         }
+        if (childOfSucc != NULL) {
+            childOfSucc->parent = parentOfSucc;
+        }
         free(successor);
-
         return root;
-    }
-
-    return root;
     }
 }
 
