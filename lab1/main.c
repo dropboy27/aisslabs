@@ -17,6 +17,7 @@ Node* CreateNode(int val) {
     newNode->right = NULL;
     return newNode;
 }
+
 Node* InsertNode(Node *root, Node *newNode){
     if (newNode == NULL){
         return root;
