@@ -1,0 +1,13 @@
+8
+alpha 15 DataA
+gamma 7 DataG
+beta 22 DataB
+alpha 10 DataA2
+delta 5 DataD
+gamma 20 DataG2
+beta 10 DataB2
+alpha 30 DataA3
+alpha 15
+gamma 7
+beta 10
+omega 100

@@ -98,95 +98,84 @@ void reverse_table(Record *dest, Record *src, int n) {
 }
 
 int main() {
-    Record table_original[N] = {
-            {"alpha", 15, "Data A"},
-            {"gamma", 7,  "Data G"},
-            {"beta",  22, "Data B"},
-            {"alpha", 10, "Data A2"},
-            {"delta", 5,  "Data D"},
-            {"gamma", 20, "Data G2"},
-            {"beta",  10, "Data B2"},
-            {"alpha", 30, "Data A3"}
-    };
-
-    printf("Initial (unsorted) table\n");
-    print_table(table_original, N);
-
-    Record *sorted   = (Record*)malloc(N * sizeof(Record));
-    Record *reverse  = (Record*)malloc(N * sizeof(Record));
-    Record *unsorted = (Record*)malloc(N * sizeof(Record));
-    if (!sorted || !reverse || !unsorted) {
-        fprintf(stderr, "Memory allocation error\n");
+    int n;
+    if (scanf("%d", &n) != 1 || n <= 0) {
+        fprintf(stderr, "Ошибка: неверное количество записей\n");
         return 1;
     }
 
-    copy_table(sorted, table_original, N);
-    counting_sort(sorted, N);
-    printf("\nCase 1: table initially sorted in ascending order\n");
-    printf("Initial state:\n");
-    print_table(sorted, N);
-    counting_sort(sorted, N);
-    printf("After sorting:\n");
-    print_table(sorted, N);
+    Record *original = (Record*)malloc(n * sizeof(Record));
+    if (!original) {
+        fprintf(stderr, "Ошибка выделения памяти\n");
+        return 1;
+    }
 
-    reverse_table(reverse, sorted, N);
-    printf("\nCase 2: table initially sorted in descending order\n");
-    printf("Initial state (reverse order):\n");
-    print_table(reverse, N);
-    counting_sort(reverse, N);
-    printf("After sorting:\n");
-    print_table(reverse, N);
-
-    copy_table(unsorted, table_original, N);
-    printf("\nCase 3: table unsorted (original)\n");
-    printf("Initial state:\n");
-    print_table(unsorted, N);
-    counting_sort(unsorted, N);
-    printf("After sorting:\n");
-    print_table(unsorted, N);
-
-    printf("\nBinary search automatic check\n");
-    printf("Searching for existing and missing keys:\n");
-
-    if (N > 0) {
-        int idx = binary_search(unsorted, N, unsorted[0].str, unsorted[0].num);
-        printf("Key (\"%s\", %d): ", unsorted[0].str, unsorted[0].num);
-        if (idx != -1) {
-            print_record(&unsorted[idx], idx+1);
-        } else {
-            printf("not found\n");
-        }
-
-        idx = binary_search(unsorted, N, unsorted[N-1].str, unsorted[N-1].num);
-        printf("Key (\"%s\", %d): ", unsorted[N-1].str, unsorted[N-1].num);
-        if (idx != -1) {
-            print_record(&unsorted[idx], idx+1);
-        } else {
-            printf("not found\n");
-        }
-
-        if (N > 1) {
-            int mid = N / 2;
-            idx = binary_search(unsorted, N, unsorted[mid].str, unsorted[mid].num);
-            printf("Key (\"%s\", %d): ", unsorted[mid].str, unsorted[mid].num);
-            if (idx != -1) {
-                print_record(&unsorted[idx], idx+1);
-            } else {
-                printf("not found\n");
-            }
-        }
-
-        idx = binary_search(unsorted, N, "ZZZ", 999999);
-        printf("Key (\"ZZZ\", 999999): ");
-        if (idx != -1) {
-            print_record(&unsorted[idx], idx+1);
-        } else {
-            printf("not found\n");
+    for (int i = 0; i < n; i++) {
+        if (scanf("%s %d %s", original[i].str, &original[i].num, original[i].data) != 3) {
+            fprintf(stderr, "Ошибка ввода данных для записи %d\n", i+1);
+            free(original);
+            return 1;
         }
     }
 
-    free(sorted);
-    free(reverse);
-    free(unsorted);
+    Record *sorted_case   = (Record*)malloc(n * sizeof(Record));
+    Record *reverse_case  = (Record*)malloc(n * sizeof(Record));
+    Record *unsorted_case = (Record*)malloc(n * sizeof(Record));
+    if (!sorted_case || !reverse_case || !unsorted_case) {
+        fprintf(stderr, "Ошибка выделения памяти\n");
+        free(original);
+        return 1;
+    }
+
+    /*Таблица изначально упорядочен*/
+    copy_table(sorted_case, original, n);
+    counting_sort(sorted_case, n); 
+    printf("\nТаблица изначально упорядочена \n");
+    print_table(sorted_case, n);
+    printf("==================");
+    counting_sort(sorted_case, n);   
+    print_table(sorted_case, n);
+
+    /*Таблица в обратном порядке*/
+    reverse_table(reverse_case, sorted_case, n);
+    printf("\nТаблица в обратном порядке\n");
+    print_table(reverse_case, n);
+    printf("==================");
+    counting_sort(reverse_case, n);
+    print_table(reverse_case, n);
+
+    /*Неупорядоченная таблица */
+    copy_table(unsorted_case, original, n);
+    printf("\nНеупорядоченная таблица\n");
+    print_table(unsorted_case, n);
+    printf("==================");
+    counting_sort(unsorted_case, n);
+    print_table(unsorted_case, n);
+
+
+    printf("\nДвоичный поиск\n");
+    printf("Ввод ключей (строка число):\n");
+    char key_str[MAX_STR_LEN];
+    int key_num;
+    int key_count = 0;
+    while (scanf("%s %d", key_str, &key_num) == 2) {
+        key_count++;
+        int idx = binary_search(unsorted_case, n, key_str, key_num);
+        if (idx != -1) {
+            printf("Ключ %d: (\"%s\", %d) найден -> ", key_count, key_str, key_num);
+            print_record(&unsorted_case[idx], idx+1);
+        } else {
+            printf("Ключ %d: (\"%s\", %d) не найден\n", key_count, key_str, key_num);
+        }
+    }
+
+    if (key_count == 0) {
+        printf("Не было введено ни одного ключа для поиска.\n");
+    }
+
+    free(original);
+    free(sorted_case);
+    free(reverse_case);
+    free(unsorted_case);
     return 0;
 }
