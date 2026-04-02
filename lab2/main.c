@@ -66,7 +66,7 @@ void counting_sort(Record *arr, int n) {
 int binary_search(Record *arr, int n, char *key_str, int key_num) {
     int left = 0, right = n - 1;
     while (left <= right) {
-        int mid = left + (right - left) / 2;
+        int mid = left + right / 2;
         int cmp = strcmp(arr[mid].str, key_str);
         if (cmp < 0) {
             left = mid + 1;
